@@ -62,8 +62,8 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const [ensoRes, cropsRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/climate/enso'),
-                axios.get('http://localhost:5000/api/crops')
+                axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso'),
+                axios.get('https://krishivishwas-backend.onrender.com/api/crops')
             ]);
             
             setEnsoData(ensoRes.data);
@@ -74,7 +74,7 @@ const Dashboard = () => {
 
             // Calculate totals and chart data for each individual crop
             await Promise.all(cropsRes.data.map(async (c) => {
-                const e = await axios.get(`http://localhost:5000/api/expenses/${c._id}`);
+                const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`);
                 totals[c._id] = e.data.total;
 
                 const tempCatTotals = { 'Seeds': 0, 'Irrigation': 0, 'Labour': 0, 'Fertilizers': 0, 'Pesticides': 0, 'Equipment': 0 };
@@ -134,27 +134,27 @@ const Dashboard = () => {
     // --- LOGIC HANDLERS (SEARCH, ADD, DELETE, EDIT, EXPORT) ---
     const handleSearch = async () => {
         if(!searchQuery) return;
-        const res = await axios.get(`http://localhost:5000/api/crops/search?q=${searchQuery}`);
+        const res = await axios.get(`https://krishivishwas-backend.onrender.com/api/crops/search?q=${searchQuery}`);
         setSearchResult(res.data[0]);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Remove this field?")) {
-            await axios.delete(`http://localhost:5000/api/crops/${id}`);
+            await axios.delete(`https://krishivishwas-backend.onrender.com/api/crops/${id}`);
             fetchData();
         }
     };
 
     const handleAddCrop = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:5000/api/crops/add', newCrop);
+        await axios.post('https://krishivishwas-backend.onrender.com/api/crops/add', newCrop);
         setNewCrop({ name: '', area: '' }); 
         fetchData();
     };
 
     const handleExpense = async (cropId) => {
         if (!expenseInput.amount) return;
-        await axios.post('http://localhost:5000/api/expenses/add', { cropId, ...expenseInput });
+        await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', { cropId, ...expenseInput });
         setExpenseInput({ amount: '', category: 'Seeds' }); 
         fetchData();
     };
@@ -165,7 +165,7 @@ const Dashboard = () => {
     };
 
     const handleEditSave = async (id) => {
-        await axios.put(`http://localhost:5000/api/crops/${id}`, editForm);
+        await axios.put(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, editForm);
         setEditingCropId(null);
         fetchData();
     };
