@@ -19,7 +19,7 @@ exports.searchCropKnowledge = async (req, res) => {
 };
 
 // --- 2. MASTER DATA SEED (The "Agri-Wiki" Database) ---
-// Run this once by visiting http://localhost:5000/api/crops/seed in your browser
+// Run this once by visiting http://localhost:5001/api/crops/seed in your browser
 exports.seedMasterData = async (req, res) => {
     try {
         // Clear existing reference data to prevent duplicates

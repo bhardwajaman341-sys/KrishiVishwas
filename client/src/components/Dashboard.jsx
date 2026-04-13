@@ -44,12 +44,12 @@ const Dashboard = () => {
     const [weatherData, setWeatherData] = useState(null);
     const [locationStatus, setLocationStatus] = useState("Fetching location...");
     const [loading, setLoading] = useState(true);
-    
+
     // Search & Forms
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState(null);
     const [newCrop, setNewCrop] = useState({ name: '', area: '' });
-    const [expenseInput, setExpenseInput] = useState({ amount: '', category: 'Seeds' });
+    const [expenseInputs, setExpenseInputs] = useState({});
 
     // Feature 3: Editing State
     const [editingCropId, setEditingCropId] = useState(null);
@@ -60,102 +60,145 @@ const Dashboard = () => {
 
     // --- DATA FETCHING (LOCAL DB + REAL WEATHER API) ---
     const fetchData = async () => {
-        try {
-            const [ensoRes, cropsRes] = await Promise.all([
-                axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso'),
-                axios.get('https://krishivishwas-backend.onrender.com/api/crops')
-            ]);
-            
-            setEnsoData(ensoRes.data);
-            setCrops(cropsRes.data);
-            
-            const totals = {};
-            const breakdowns = {}; 
+    try {
+        const [ensoRes, cropsRes] = await Promise.all([
+            axios.get('http://localhost:5001/api/climate/enso'),
+            axios.get('http://localhost:5001/api/crops')
+        ]);
 
-            // Calculate totals and chart data for each individual crop
-            await Promise.all(cropsRes.data.map(async (c) => {
-                const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`);
-                totals[c._id] = e.data.total;
+        setEnsoData(ensoRes.data);
+        setCrops(cropsRes.data);
 
-                const tempCatTotals = { 'Seeds': 0, 'Irrigation': 0, 'Labour': 0, 'Fertilizers': 0, 'Pesticides': 0, 'Equipment': 0 };
-                const expenseList = e.data.expenses || []; 
-                expenseList.forEach(exp => {
-                    const cat = exp.category ? exp.category.trim() : '';
-                    if (tempCatTotals[cat] !== undefined) {
-                        tempCatTotals[cat] += Number(exp.amount);
+        const totals = {};
+        const breakdowns = {};
+
+        // Helper map to know which index belongs to which category
+        const categoryMap = {
+            'Seeds': 0,
+            'Irrigation': 1,
+            'Labour': 2,
+            'Fertilizers': 3,
+            'Pesticides': 4,
+            'Equipment': 5
+        };
+
+        await Promise.all(cropsRes.data.map(async (c) => {
+            const e = await axios.get(`http://localhost:5001/api/expenses/${c._id}`);
+            totals[c._id] = e.data.total;
+            
+            // 1. Start with an empty array of 6 zeros
+            const chartData = [0, 0, 0, 0, 0, 0];
+            
+            // 2. Loop through the database expenses and add the amounts to the correct slot
+            e.data.expenses.forEach(exp => {
+                const index = categoryMap[exp.category];
+                if (index !== undefined) {
+                    chartData[index] += Number(exp.amount);
+                }
+            });
+
+            // 3. Save the perfectly formatted number array into state
+            breakdowns[c._id] = chartData; 
+        }));
+
+        setExpenses(totals);
+        setCropBreakdowns(breakdowns);
+    } catch (err) {
+        console.error("Backend Fetch Error:", err);
+    } finally {
+        setLoading(false);
+    }
+};
+
+    // 2. Fetch Weather Independently (Also pulled out for cleanliness)
+    const fetchWeather = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    try {
+                        const { latitude, longitude } = pos.coords;
+                        setLocationStatus("Current Location");
+                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(2)}&longitude=${longitude.toFixed(2)}&current_weather=true`);
+                        const data = await response.json();
+                        setWeatherData(data.current_weather);
+                    } catch (weatherErr) {
+                        console.log("Weather API blocked by network. Using fallback.");
+                        setWeatherData({ temperature: 28 });
                     }
-                });
-                
-                breakdowns[c._id] = [
-                    tempCatTotals['Seeds'], tempCatTotals['Irrigation'], tempCatTotals['Labour'],
-                    tempCatTotals['Fertilizers'], tempCatTotals['Pesticides'], tempCatTotals['Equipment']
-                ];
-            }));
-            
-            setExpenses(totals);
-            setCropBreakdowns(breakdowns); 
-            setLoading(false);
-
-            // --- SAFER WEATHER FETCH ---
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    async (pos) => {
-                        try {
-                            const { latitude, longitude } = pos.coords;
-                            setLocationStatus("Current Location");
-                            const response = await fetch(`/api/weather/v1/forecast?latitude=${latitude.toFixed(2)}&longitude=${longitude.toFixed(2)}&current_weather=true`);
-                            const data = await response.json();
-                            setWeatherData(data.current_weather);
-                        } catch (weatherErr) {
-                            console.log("Weather API blocked by network. Using fallback.");
-                            setWeatherData({ temperature: 28 });
-                        }
-                    },
-                    async () => {
-                        try {
-                            setLocationStatus("Central India (Default)");
-                            const response = await fetch(`/api/weather/v1/forecast?latitude=23.72&longitude=85.50&current_weather=true`);
-                            const data = await response.json();
-                            setWeatherData(data.current_weather);
-                        } catch (weatherErr) {
-                            setWeatherData({ temperature: 30 }); 
-                        }
+                },
+                async () => {
+                    try {
+                        setLocationStatus("Central India (Default)");
+                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=23.72&longitude=85.50&current_weather=true`);
+                        const data = await response.json();
+                        setWeatherData(data.current_weather);
+                    } catch (weatherErr) {
+                        setWeatherData({ temperature: 30 });
                     }
-                );
-            }
-        } catch (err) { 
-            console.error("Fetch Error:", err);
-            setLoading(false); 
+                }
+            );
+        } else {
+            setLocationStatus("Geolocation not supported");
+            setWeatherData({ temperature: 30 });
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    // 3. Now the useEffect just calls the reusable functions on initial load
+    useEffect(() => {
+        fetchData();
+        fetchWeather();
+    }, []);
 
     // --- LOGIC HANDLERS (SEARCH, ADD, DELETE, EDIT, EXPORT) ---
     const handleSearch = async () => {
-        if(!searchQuery) return;
-        const res = await axios.get(`https://krishivishwas-backend.onrender.com/api/crops/search?q=${searchQuery}`);
+        if (!searchQuery) return;
+        const res = await axios.get(`http://localhost:5001/api/crops/search?q=${searchQuery}`);
         setSearchResult(res.data[0]);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Remove this field?")) {
-            await axios.delete(`https://krishivishwas-backend.onrender.com/api/crops/${id}`);
+            await axios.delete(`http://localhost:5001/api/crops/${id}`);
             fetchData();
         }
     };
 
     const handleAddCrop = async (e) => {
         e.preventDefault();
-        await axios.post('https://krishivishwas-backend.onrender.com/api/crops/add', newCrop);
-        setNewCrop({ name: '', area: '' }); 
+        await axios.post('http://localhost:5001/api/crops/add', newCrop);
+        setNewCrop({ name: '', area: '' });
         fetchData();
     };
 
+    const handleExpenseChange = (cropId, field, value) => {
+        setExpenseInputs(prev => ({
+            ...prev,
+            [cropId]: {
+                ...prev[cropId],
+                category: prev[cropId]?.category || 'Seeds', // Keep default 'Seeds' if untouched
+                [field]: value
+            }
+        }));
+    };
+
     const handleExpense = async (cropId) => {
-        if (!expenseInput.amount) return;
-        await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', { cropId, ...expenseInput });
-        setExpenseInput({ amount: '', category: 'Seeds' }); 
+        const inputForCrop = expenseInputs[cropId];
+
+        // Stop if there's no data or no amount entered for THIS specific crop
+        if (!inputForCrop || !inputForCrop.amount) return;
+
+        await axios.post('http://localhost:5001/api/expenses/add', {
+            cropId,
+            amount: inputForCrop.amount,
+            category: inputForCrop.category || 'Seeds'
+        });
+
+        // Clear the input ONLY for this specific crop after saving
+        setExpenseInputs(prev => ({
+            ...prev,
+            [cropId]: { amount: '', category: 'Seeds' }
+        }));
+
         fetchData();
     };
 
@@ -165,7 +208,7 @@ const Dashboard = () => {
     };
 
     const handleEditSave = async (id) => {
-        await axios.put(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, editForm);
+        await axios.put(`http://localhost:5001/api/crops/${id}`, editForm);
         setEditingCropId(null);
         fetchData();
     };
@@ -184,16 +227,16 @@ const Dashboard = () => {
 
     const grandTotal = Object.values(expenses).reduce((a, b) => a + b, 0);
 
-    if (loading) return <h2 style={{color: 'white', textAlign: 'center', marginTop: '50px'}}>{t.loading}</h2>;
+    if (loading) return <h2 style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>{t.loading}</h2>;
 
     return (
         <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto', color: 'white', fontFamily: 'sans-serif' }}>
-            
+
             {/* Native Custom Language Switcher */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-                <select 
-                    value={lang} 
-                    onChange={(e) => setLang(e.target.value)} 
+                <select
+                    value={lang}
+                    onChange={(e) => setLang(e.target.value)}
                     style={{ background: '#3498db', color: 'white', padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontWeight: 'bold', outline: 'none' }}
                 >
                     <option value="en">English</option>
@@ -222,6 +265,42 @@ const Dashboard = () => {
                 <input type="text" placeholder={t.searchPlaceholder} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ padding: '15px', flex: 1, borderRadius: '30px', border: 'none', background: 'rgba(255,255,255,0.1)', color: 'white' }} />
                 <button onClick={handleSearch} style={{ background: '#3498db', color: 'white', padding: '0 30px', borderRadius: '30px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>{t.searchBtn}</button>
             </div>
+
+            {/* ---> NEW: DISPLAY KNOWLEDGE BANK SEARCH RESULTS <--- */}
+{/* ---> NEW: DISPLAY KNOWLEDGE BANK SEARCH RESULTS <--- */}
+            {searchResult && (
+                <div style={{ background: '#2c3e50', padding: '20px', borderRadius: '15px', marginBottom: '30px', borderLeft: '5px solid #3498db' }}>
+                    <h3 style={{ margin: '0 0 10px 0', color: '#f1c40f' }}>🔍 Knowledge Bank Result:</h3>
+                    
+                    {/* Look for cropName first, fallback to name if needed */}
+                    <p style={{ margin: '5px 0' }}>
+                        <strong>Crop:</strong> {searchResult.cropName || searchResult.name}
+                    </p>
+                    
+                    {/* Show Best Season if it exists in the database */}
+                    {searchResult.bestSeason && (
+                        <p style={{ margin: '5px 0' }}>
+                            <strong>Best Season:</strong> {searchResult.bestSeason}
+                        </p>
+                    )}
+
+                    {/* Show Fertilizers if they exist in the database */}
+                    {searchResult.fertilizers && searchResult.fertilizers.length > 0 && (
+                        <p style={{ margin: '5px 0' }}>
+                            <strong>Recommended Fertilizers:</strong> {searchResult.fertilizers.join(', ')}
+                        </p>
+                    )}
+
+                    {/* Show Area ONLY if it's a registered field instead of an article */}
+                    {searchResult.area && (
+                        <p style={{ margin: '5px 0' }}>
+                            <strong>Area:</strong> {searchResult.area} Acres
+                        </p>
+                    )}
+
+                    <button onClick={() => setSearchResult(null)} style={{ marginTop: '15px', background: '#e74c3c', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer' }}>Close Result</button>
+                </div>
+            )}
 
             {/* Top Cards Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
@@ -258,8 +337,8 @@ const Dashboard = () => {
 
             {/* Add Crop Form */}
             <form onSubmit={handleAddCrop} style={{ display: 'flex', gap: '10px', background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', marginBottom: '30px', marginTop: '30px' }}>
-                <input type="text" placeholder={t.cropNamePlace} value={newCrop.name} onChange={(e) => setNewCrop({...newCrop, name: e.target.value})} style={{ padding: '12px', flex: 2, borderRadius: '8px', background: '#222', border: '1px solid #444', color: 'white' }} required />
-                <input type="number" placeholder={t.acresPlace} value={newCrop.area} onChange={(e) => setNewCrop({...newCrop, area: e.target.value})} style={{ padding: '12px', flex: 1, borderRadius: '8px', background: '#222', border: '1px solid #444', color: 'white' }} required />
+                <input type="text" placeholder={t.cropNamePlace} value={newCrop.name} onChange={(e) => setNewCrop({ ...newCrop, name: e.target.value })} style={{ padding: '12px', flex: 2, borderRadius: '8px', background: '#222', border: '1px solid #444', color: 'white' }} required />
+                <input type="number" placeholder={t.acresPlace} value={newCrop.area} onChange={(e) => setNewCrop({ ...newCrop, area: e.target.value })} style={{ padding: '12px', flex: 1, borderRadius: '8px', background: '#222', border: '1px solid #444', color: 'white' }} required />
                 <button type="submit" style={{ background: '#2ecc71', color: 'white', border: 'none', padding: '0 25px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>{t.registerBtn}</button>
             </form>
 
@@ -267,12 +346,12 @@ const Dashboard = () => {
             <div style={{ display: 'grid', gap: '20px' }}>
                 {crops.map((crop) => (
                     <div key={crop._id} style={{ background: '#2c3e50', padding: '25px', borderRadius: '15px', borderLeft: '5px solid #f1c40f' }}>
-                        
+
                         {/* Edit Logic Toggle */}
                         {editingCropId === crop._id ? (
                             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                                <input type="text" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} style={{ padding: '8px', borderRadius: '5px' }} />
-                                <input type="number" value={editForm.area} onChange={(e) => setEditForm({...editForm, area: e.target.value})} style={{ padding: '8px', borderRadius: '5px', width: '80px' }} />
+                                <input type="text" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} style={{ padding: '8px', borderRadius: '5px' }} />
+                                <input type="number" value={editForm.area} onChange={(e) => setEditForm({ ...editForm, area: e.target.value })} style={{ padding: '8px', borderRadius: '5px', width: '80px' }} />
                                 <button onClick={() => handleEditSave(crop._id)} style={{ background: '#2ecc71', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>{t.saveBtn} ✅</button>
                                 <button onClick={() => setEditingCropId(null)} style={{ background: '#95a5a6', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>{t.cancelBtn}</button>
                             </div>
@@ -285,18 +364,22 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Visualization Chart */}
                         {cropBreakdowns[crop._id] && (
                             <div style={{ marginTop: '20px' }}>
                                 <ExpenseChart dataValues={cropBreakdowns[crop._id]} />
                             </div>
                         )}
-                        
+
                         {/* Expense Logger */}
                         <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '10px' }}>
-                            <select value={expenseInput.category} onChange={(e) => setExpenseInput({...expenseInput, category: e.target.value})} style={{ padding: '5px', borderRadius: '5px' }}>
-                                {/* Note: Values stay in English for the Database, but display changes based on language */}
+
+                            <select
+                                value={expenseInputs[crop._id]?.category || 'Seeds'}
+                                onChange={(e) => handleExpenseChange(crop._id, 'category', e.target.value)}
+                                style={{ padding: '5px', borderRadius: '5px' }}
+                            >
                                 <option value="Seeds">{t.seeds}</option>
                                 <option value="Irrigation">{t.irrigation}</option>
                                 <option value="Labour">{t.labour}</option>
@@ -304,8 +387,19 @@ const Dashboard = () => {
                                 <option value="Pesticides">{t.pesticides}</option>
                                 <option value="Equipment">{t.equipment}</option>
                             </select>
-                            <input type="number" placeholder={t.amountPlaceholder} onChange={(e) => setExpenseInput({...expenseInput, amount: e.target.value})} value={expenseInput.amount} style={{ width: '100px', padding: '5px', borderRadius: '5px' }} />
-                            <button onClick={() => handleExpense(crop._id)} style={{ background: '#3498db', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}>{t.logCostBtn}</button>
+
+                            <input
+                                type="number"
+                                placeholder={t.amountPlaceholder}
+                                value={expenseInputs[crop._id]?.amount || ''}
+                                onChange={(e) => handleExpenseChange(crop._id, 'amount', e.target.value)}
+                                style={{ width: '100px', padding: '5px', borderRadius: '5px' }}
+                            />
+
+                            <button onClick={() => handleExpense(crop._id)} style={{ background: '#3498db', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}>
+                                {t.logCostBtn}
+                            </button>
+
                             <span style={{ marginLeft: 'auto', fontWeight: 'bold' }}>{t.fieldCost}: ₹{expenses[crop._id] || 0}</span>
                         </div>
                     </div>
