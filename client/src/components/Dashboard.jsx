@@ -62,8 +62,8 @@ const Dashboard = () => {
     const fetchData = async () => {
     try {
         const [ensoRes, cropsRes] = await Promise.all([
-            axios.get('http://localhost:5001/api/climate/enso'),
-            axios.get('http://localhost:5001/api/crops')
+            axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso'),
+            axios.get('https://krishivishwas-backend.onrender.com/api/crops')
         ]);
 
         setEnsoData(ensoRes.data);
@@ -83,7 +83,7 @@ const Dashboard = () => {
         };
 
         await Promise.all(cropsRes.data.map(async (c) => {
-            const e = await axios.get(`http://localhost:5001/api/expenses/${c._id}`);
+            const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`);
             totals[c._id] = e.data.total;
             
             // 1. Start with an empty array of 6 zeros
@@ -152,20 +152,20 @@ const Dashboard = () => {
     // --- LOGIC HANDLERS (SEARCH, ADD, DELETE, EDIT, EXPORT) ---
     const handleSearch = async () => {
         if (!searchQuery) return;
-        const res = await axios.get(`http://localhost:5001/api/crops/search?q=${searchQuery}`);
+        const res = await axios.get(`https://krishivishwas-backend.onrender.com/api/crops/search?q=${searchQuery}`);
         setSearchResult(res.data[0]);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Remove this field?")) {
-            await axios.delete(`http://localhost:5001/api/crops/${id}`);
+            await axios.delete(`https://krishivishwas-backend.onrender.com/api/crops/${id}`);
             fetchData();
         }
     };
 
     const handleAddCrop = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:5001/api/crops/add', newCrop);
+        await axios.post('https://krishivishwas-backend.onrender.com/api/crops/add', newCrop);
         setNewCrop({ name: '', area: '' });
         fetchData();
     };
@@ -187,7 +187,7 @@ const Dashboard = () => {
         // Stop if there's no data or no amount entered for THIS specific crop
         if (!inputForCrop || !inputForCrop.amount) return;
 
-        await axios.post('http://localhost:5001/api/expenses/add', {
+        await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', {
             cropId,
             amount: inputForCrop.amount,
             category: inputForCrop.category || 'Seeds'
@@ -208,7 +208,7 @@ const Dashboard = () => {
     };
 
     const handleEditSave = async (id) => {
-        await axios.put(`http://localhost:5001/api/crops/${id}`, editForm);
+        await axios.put(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, editForm);
         setEditingCropId(null);
         fetchData();
     };
