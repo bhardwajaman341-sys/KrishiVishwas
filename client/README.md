@@ -1,16 +1,21 @@
-# React + Vite
+# 🌱 KrishiVishwas
+**Vision 2047: Viksit Bharat | BGI Hackathon 2026**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📖 Overview
+KrishiVishwas is a full-stack AgriTech dashboard designed to empower Indian farmers with data-driven decision-making. It replaces traditional agricultural guesswork by providing real-time local weather, macroeconomic climate impact analysis (ENSO tracking), farm-level financial tracking, and a multilingual AI assistant.
 
-Currently, two official plugins are available:
+## 🚀 Live Links
+* **Live Application:**(https://krishi-vishwas.vercel.app/)
+* **Source Code:** (https://github.com/bhardwajaman341-sys/KrishiVishwas)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Key Features
+* **Krishi Mitra AI:** A multilingual (Hindi/English) agricultural chatbot powered by Google Gemini, designed to break the digital literacy barrier for rural farmers.
+* **Smart Knowledge Bank:** A case-insensitive, Regex-powered MongoDB database allowing farmers to search for ideal seasons, fertilizers, and disease management for specific crops.
+* **ENSO Climate Tracker:** Educational video integration and climate analysis detailing how El Niño and La Niña impact the Indian Monsoon, helping farmers plan drought-resistant or water-intensive crops.
+* **Financial Dashboard:** Visual expense tracking allowing farmers to monitor investments in seeds, labor, and fertilizers.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 💻 Tech Stack
+* **Frontend:** React.js, Vite, Axios (Deployed on Vercel)
+* **Backend:** Node.js, Express.js (Deployed on Render)
+* **Database:** MongoDB Atlas
+* **External APIs:** Google Gemini AI (Generative LLM), Open-Meteo API (Geolocation & Weather)
