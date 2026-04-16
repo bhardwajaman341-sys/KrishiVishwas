@@ -101,7 +101,7 @@ const Chatbot = () => {
 
             {/* The Chat Window */}
             {isOpen && (
-                <div style={{ width: '320px', height: '450px', background: 'white', borderRadius: '15px', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+                <div style={{ width: '320px', height: '450px', background: 'white', borderRadius: '15px', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 9999, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
                     
                     {/* Header */}
                     <div style={{ background: '#2c3e50', color: 'white', padding: '10px 15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>

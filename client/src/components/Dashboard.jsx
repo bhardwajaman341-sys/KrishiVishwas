@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ExpenseChart from './ExpenseChart';
 import EnsoExplainer from './EnsoExplainer';
+import Chatbot from './Chatbot';
 
 // --- TRANSLATION DICTIONARY ---
-// You can easily add 'mr' (Marathi), 'pa' (Punjabi), etc., here later!
 const translations = {
     en: {
-        title1: "Krishi", title2: "Vishwas", subtitle: "Vision 2047: Vikshit Bharat",
+        title1: "Krishi", title2: "Vishwas", 
+        subtitle1: "Vision 2047: Viksit ", subtitle2: "Bharat",
         searchPlaceholder: "Search Knowledge Bank...", searchBtn: "Search",
         weatherTitle: "Local Weather", temp: "Temp",
         investmentTitle: "Total Farm Investment", downloadBtn: "Download Report",
@@ -20,7 +21,8 @@ const translations = {
         amountPlaceholder: "Amount ₹"
     },
     hi: {
-        title1: "कृषि", title2: "विश्वास", subtitle: "विजन 2047: विकसित भारत",
+        title1: "कृषि", title2: "विश्वास", 
+        subtitle1: "विजन 2047: विकसित ", subtitle2: "भारत",
         searchPlaceholder: "ज्ञान बैंक खोजें...", searchBtn: "खोजें",
         weatherTitle: "स्थानीय मौसम", temp: "तापमान",
         investmentTitle: "कुल कृषि निवेश", downloadBtn: "रिपोर्ट डाउनलोड करें",
@@ -36,12 +38,14 @@ const translations = {
 
 const Dashboard = () => {
     // --- STATE MANAGEMENT ---
-    const [lang, setLang] = useState('en'); // Native Language State
+    const [lang, setLang] = useState('en'); 
     const [ensoData, setEnsoData] = useState(null);
     const [crops, setCrops] = useState([]);
     const [expenses, setExpenses] = useState({});
     const [cropBreakdowns, setCropBreakdowns] = useState({});
-    const [weatherData, setWeatherData] = useState(null);
+    
+    // UPDATED: Weather state now holds both temp and rainChance
+    const [weatherData, setWeatherData] = useState({ temp: "--", rainChance: "--" });
     const [locationStatus, setLocationStatus] = useState("Fetching location...");
     const [loading, setLoading] = useState(true);
 
@@ -60,86 +64,96 @@ const Dashboard = () => {
 
     // --- DATA FETCHING (LOCAL DB + REAL WEATHER API) ---
     const fetchData = async () => {
-    try {
-        const [ensoRes, cropsRes] = await Promise.all([
-            axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso'),
-            axios.get('https://krishivishwas-backend.onrender.com/api/crops')
-        ]);
+        try {
+            const [ensoRes, cropsRes] = await Promise.all([
+                axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso'),
+                axios.get('https://krishivishwas-backend.onrender.com/api/crops')
+            ]);
 
-        setEnsoData(ensoRes.data);
-        setCrops(cropsRes.data);
+            setEnsoData(ensoRes.data);
+            setCrops(cropsRes.data);
 
-        const totals = {};
-        const breakdowns = {};
+            const totals = {};
+            const breakdowns = {};
 
-        // Helper map to know which index belongs to which category
-        const categoryMap = {
-            'Seeds': 0,
-            'Irrigation': 1,
-            'Labour': 2,
-            'Fertilizers': 3,
-            'Pesticides': 4,
-            'Equipment': 5
-        };
+            const categoryMap = {
+                'Seeds': 0,
+                'Irrigation': 1,
+                'Labour': 2,
+                'Fertilizers': 3,
+                'Pesticides': 4,
+                'Equipment': 5
+            };
 
-        await Promise.all(cropsRes.data.map(async (c) => {
-            const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`);
-            totals[c._id] = e.data.total;
-            
-            // 1. Start with an empty array of 6 zeros
-            const chartData = [0, 0, 0, 0, 0, 0];
-            
-            // 2. Loop through the database expenses and add the amounts to the correct slot
-            e.data.expenses.forEach(exp => {
-                const index = categoryMap[exp.category];
-                if (index !== undefined) {
-                    chartData[index] += Number(exp.amount);
-                }
-            });
+            await Promise.all(cropsRes.data.map(async (c) => {
+                const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`);
+                totals[c._id] = e.data.total;
+                
+                const chartData = [0, 0, 0, 0, 0, 0];
+                
+                e.data.expenses.forEach(exp => {
+                    const index = categoryMap[exp.category];
+                    if (index !== undefined) {
+                        chartData[index] += Number(exp.amount);
+                    }
+                });
 
-            // 3. Save the perfectly formatted number array into state
-            breakdowns[c._id] = chartData; 
-        }));
+                breakdowns[c._id] = chartData; 
+            }));
 
-        setExpenses(totals);
-        setCropBreakdowns(breakdowns);
-    } catch (err) {
-        console.error("Backend Fetch Error:", err);
-    } finally {
-        setLoading(false);
-    }
-};
+            setExpenses(totals);
+            setCropBreakdowns(breakdowns);
+        } catch (err) {
+            console.error("Backend Fetch Error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // 2. Fetch Weather Independently (Also pulled out for cleanliness)
+    // 2. Fetch Weather using OpenWeatherMap for accurate Temp & Rain %
     const fetchWeather = () => {
+        const API_KEY = "f628fe54a0e9a49e2fdc838c1f7ecf6d"; // PASTE YOUR KEY HERE
+
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     try {
                         const { latitude, longitude } = pos.coords;
                         setLocationStatus("Current Location");
-                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(2)}&longitude=${longitude.toFixed(2)}&current_weather=true`);
+                        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`);
                         const data = await response.json();
-                        setWeatherData(data.current_weather);
+
+                        if (data.list && data.list.length > 0) {
+                            setWeatherData({
+                                temp: Math.round(data.list[0].main.temp),
+                                rainChance: Math.round(data.list[0].pop * 100)
+                            });
+                        }
                     } catch (weatherErr) {
                         console.log("Weather API blocked by network. Using fallback.");
-                        setWeatherData({ temperature: 28 });
+                        setWeatherData({ temp: 28, rainChance: 10 });
                     }
                 },
                 async () => {
                     try {
                         setLocationStatus("Central India (Default)");
-                        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=23.72&longitude=85.50&current_weather=true`);
+                        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=23.72&lon=85.50&units=metric&appid=${API_KEY}`);
                         const data = await response.json();
-                        setWeatherData(data.current_weather);
+
+                        if (data.list && data.list.length > 0) {
+                            setWeatherData({
+                                temp: Math.round(data.list[0].main.temp),
+                                rainChance: Math.round(data.list[0].pop * 100)
+                            });
+                        }
                     } catch (weatherErr) {
-                        setWeatherData({ temperature: 30 });
+                        setWeatherData({ temp: 30, rainChance: 0 });
                     }
                 }
             );
         } else {
             setLocationStatus("Geolocation not supported");
-            setWeatherData({ temperature: 30 });
+            setWeatherData({ temp: 30, rainChance: 0 });
         }
     };
 
@@ -175,7 +189,7 @@ const Dashboard = () => {
             ...prev,
             [cropId]: {
                 ...prev[cropId],
-                category: prev[cropId]?.category || 'Seeds', // Keep default 'Seeds' if untouched
+                category: prev[cropId]?.category || 'Seeds',
                 [field]: value
             }
         }));
@@ -184,7 +198,6 @@ const Dashboard = () => {
     const handleExpense = async (cropId) => {
         const inputForCrop = expenseInputs[cropId];
 
-        // Stop if there's no data or no amount entered for THIS specific crop
         if (!inputForCrop || !inputForCrop.amount) return;
 
         await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', {
@@ -193,7 +206,6 @@ const Dashboard = () => {
             category: inputForCrop.category || 'Seeds'
         });
 
-        // Clear the input ONLY for this specific crop after saving
         setExpenseInputs(prev => ({
             ...prev,
             [cropId]: { amount: '', category: 'Seeds' }
@@ -245,18 +257,18 @@ const Dashboard = () => {
             </div>
 
             <header style={{ textAlign: 'center', marginBottom: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {/* The New Logo */}
                 <img
                     src="/logo.png"
                     alt="KrishiVishwas Logo"
                     style={{ width: '100px', height: '100px', marginBottom: '15px', borderRadius: '50%', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}
                 />
 
-                <h1 style={{ fontSize: '4.5rem', margin: 0, fontWeight: '900', letterSpacing: '-1px' }}>
-                    {t.title1}<span style={{ color: '#3498db' }}>{t.title2}</span>
+                <h1 style={{ fontSize: 'clamp(2.5rem, 10vw, 4.5rem)', margin: 0, fontWeight: '900', letterSpacing: '-1px', textAlign: 'center' }}>
+                    <span style={{ color: '#ff9800' }}>{t.title1}</span><span style={{ color: '#2ecc71' }}>{t.title2}</span>
                 </h1>
-                <p style={{ color: '#bdc3c7', margin: '20px 0 0 0', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                    {t.subtitle}
+                
+                <p style={{ color: '#ffffff', margin: '35px 0 0 0', letterSpacing: '2px', textTransform: 'uppercase', fontSize: 'clamp(0.7rem, 3vw, 1rem)', textAlign: 'center', fontWeight: 'bold' }}>
+                    {t.subtitle1}{t.subtitle2}
                 </p>
             </header>
 
@@ -267,31 +279,26 @@ const Dashboard = () => {
             </div>
 
             {/* ---> NEW: DISPLAY KNOWLEDGE BANK SEARCH RESULTS <--- */}
-{/* ---> NEW: DISPLAY KNOWLEDGE BANK SEARCH RESULTS <--- */}
             {searchResult && (
                 <div style={{ background: '#2c3e50', padding: '20px', borderRadius: '15px', marginBottom: '30px', borderLeft: '5px solid #3498db' }}>
                     <h3 style={{ margin: '0 0 10px 0', color: '#f1c40f' }}>🔍 Knowledge Bank Result:</h3>
                     
-                    {/* Look for cropName first, fallback to name if needed */}
                     <p style={{ margin: '5px 0' }}>
                         <strong>Crop:</strong> {searchResult.cropName || searchResult.name}
                     </p>
                     
-                    {/* Show Best Season if it exists in the database */}
                     {searchResult.bestSeason && (
                         <p style={{ margin: '5px 0' }}>
                             <strong>Best Season:</strong> {searchResult.bestSeason}
                         </p>
                     )}
 
-                    {/* Show Fertilizers if they exist in the database */}
                     {searchResult.fertilizers && searchResult.fertilizers.length > 0 && (
                         <p style={{ margin: '5px 0' }}>
                             <strong>Recommended Fertilizers:</strong> {searchResult.fertilizers.join(', ')}
                         </p>
                     )}
 
-                    {/* Show Area ONLY if it's a registered field instead of an article */}
                     {searchResult.area && (
                         <p style={{ margin: '5px 0' }}>
                             <strong>Area:</strong> {searchResult.area} Acres
@@ -304,6 +311,7 @@ const Dashboard = () => {
 
             {/* Top Cards Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+                
                 {/* 1. ENSO Card */}
                 <div style={{ background: '#e6f2ff', color: '#2c3e50', padding: '20px', borderRadius: '15px', borderBottom: '5px solid #3498db' }}>
                     <h3 style={{ margin: 0 }}>🌍 {ensoData?.phase}</h3>
@@ -313,11 +321,14 @@ const Dashboard = () => {
                     <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>{ensoData?.recommendation}</p>
                 </div>
 
-                {/* 2. Weather Card */}
+                {/* 2. Weather Card (UPDATED) */}
                 <div style={{ background: '#fff3e0', color: '#d35400', padding: '20px', borderRadius: '15px', borderBottom: '5px solid #f39c12' }}>
                     <h3 style={{ margin: 0 }}>🌤️ {t.weatherTitle}</h3>
                     <div style={{ margin: '10px 0', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                        {t.temp}: <span style={{ color: '#c0392b' }}>{weatherData?.temperature || '--'}°C</span>
+                        {t.temp}: <span style={{ color: '#c0392b' }}>{weatherData.temp}°C</span>
+                    </div>
+                    <div style={{ margin: '5px 0', fontSize: '1rem', fontWeight: 'bold', color: '#2980b9' }}>
+                        🌧️ Chance of Rain: {weatherData.rainChance}%
                     </div>
                     <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>📍 {locationStatus}</p>
                 </div>
@@ -405,6 +416,9 @@ const Dashboard = () => {
                     </div>
                 ))}
             </div>
+            
+            {/* ---> The Chatbot is safely rendered here <--- */}
+            <Chatbot />
         </div>
     );
 };
