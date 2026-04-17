@@ -72,7 +72,7 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             // 1. Fetch Public ENSO data (No token needed)
-            const ensoRes = await axios.get('http://localhost:5001/api/climate/enso');
+            const ensoRes = await axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso');
             setEnsoData(ensoRes.data);
 
             // 2. Fetch Secure Crop Data (ONLY if user is logged in)
@@ -80,7 +80,7 @@ const Dashboard = () => {
                 const token = await getToken();
                 const headers = { Authorization: `Bearer ${token}` };
 
-                const cropsRes = await axios.get('http://localhost:5001/api/crops', { headers });
+                const cropsRes = await axios.get('https://krishivishwas-backend.onrender.com/api/crops', { headers });
                 setCrops(cropsRes.data);
 
                 const totals = {};
@@ -91,7 +91,7 @@ const Dashboard = () => {
                 };
 
                 await Promise.all(cropsRes.data.map(async (c) => {
-                    const e = await axios.get(`http://localhost:5001/api/expenses/${c._id}`, { headers });
+                    const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`, { headers });
                     totals[c._id] = e.data.total;
                     
                     const chartData = [0, 0, 0, 0, 0, 0];
@@ -175,14 +175,14 @@ const Dashboard = () => {
     const handleSearch = async () => {
         if (!searchQuery) return;
         // Knowledge Bank is public, no token needed
-        const res = await axios.get(`http://localhost:5001/api/crops/search?q=${searchQuery}`);
+        const res = await axios.get(`https://krishivishwas-backend.onrender.com/api/crops/search?q=${searchQuery}`);
         setSearchResult(res.data[0]);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Remove this field?")) {
             const token = await getToken();
-            await axios.delete(`http://localhost:5001/api/crops/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.delete(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, { headers: { Authorization: `Bearer ${token}` } });
             fetchData();
         }
     };
@@ -190,7 +190,7 @@ const Dashboard = () => {
     const handleAddCrop = async (e) => {
         e.preventDefault();
         const token = await getToken();
-        await axios.post('http://localhost:5001/api/crops/add', newCrop, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.post('https://krishivishwas-backend.onrender.com/api/crops/add', newCrop, { headers: { Authorization: `Bearer ${token}` } });
         setNewCrop({ name: '', area: '' });
         fetchData();
     };
@@ -211,7 +211,7 @@ const Dashboard = () => {
         if (!inputForCrop || !inputForCrop.amount) return;
 
         const token = await getToken();
-        await axios.post('http://localhost:5001/api/expenses/add', {
+        await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', {
             cropId,
             amount: inputForCrop.amount,
             category: inputForCrop.category || 'Seeds'
@@ -231,7 +231,7 @@ const Dashboard = () => {
 
     const handleEditSave = async (id) => {
         const token = await getToken();
-        await axios.put(`http://localhost:5001/api/crops/${id}`, editForm, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.put(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, editForm, { headers: { Authorization: `Bearer ${token}` } });
         setEditingCropId(null);
         fetchData();
     };
