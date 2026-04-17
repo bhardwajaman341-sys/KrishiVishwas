@@ -19,7 +19,7 @@ exports.searchCropKnowledge = async (req, res) => {
 };
 
 // --- 2. MASTER DATA SEED (The "Agri-Wiki" Database) ---
-// Run this once by visiting https://krishivishwas-backend.onrender.com/api/crops/seed in your browser
+// Run this once by visiting http://localhost:5001/api/crops/seed in your browser
 exports.seedMasterData = async (req, res) => {
     try {
         // Clear existing reference data to prevent duplicates
@@ -66,11 +66,11 @@ exports.seedMasterData = async (req, res) => {
 };
 
 // --- 3. PERSONAL CROP MANAGEMENT ---
-
-// Get all crops for the specific farmer
+// Get all crops for the specific logged-in farmer
 exports.getCrops = async (req, res) => {
     try {
-        const crops = await Crop.find();
+        // Find crops where the userId matches the logged-in user
+        const crops = await Crop.find({ userId: req.auth.userId });
         res.status(200).json(crops);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -80,7 +80,11 @@ exports.getCrops = async (req, res) => {
 // Add a new crop field
 exports.addCrop = async (req, res) => {
     try {
-        const newCrop = new Crop(req.body);
+        // Attach the userId to the new crop before saving
+        const newCrop = new Crop({
+            ...req.body,
+            userId: req.auth.userId 
+        });
         await newCrop.save();
         res.status(201).json(newCrop);
     } catch (err) {
@@ -92,10 +96,11 @@ exports.addCrop = async (req, res) => {
 exports.deleteCrop = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedCrop = await Crop.findByIdAndDelete(id);
+        // Ensure the user deleting the crop actually owns it
+        const deletedCrop = await Crop.findOneAndDelete({ _id: id, userId: req.auth.userId });
         
         if (!deletedCrop) {
-            return res.status(404).json({ message: "Crop record not found" });
+            return res.status(404).json({ message: "Crop record not found or unauthorized" });
         }
 
         // Clean up: Delete all expenses linked to this crop ID
@@ -107,16 +112,16 @@ exports.deleteCrop = async (req, res) => {
     }
 };
 
-// Update status (e.g., from 'Growing' to 'Harvested')
+// Update status
 exports.updateCropStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
         
-        const updated = await Crop.findByIdAndUpdate(
-            id, 
+        const updated = await Crop.findOneAndUpdate(
+            { _id: id, userId: req.auth.userId }, // Verify ownership
             { status: status }, 
-            { new: true }
+            { returnDocument: 'after' }
         );
         res.status(200).json(updated);
     } catch (err) {
@@ -124,20 +129,20 @@ exports.updateCropStatus = async (req, res) => {
     }
 };
 
-// --- FEATURE 3: Update an existing field (name and area) ---
+// FEATURE 3: Update an existing field (name and area)
 exports.updateCrop = async (req, res) => {
     try {
-        const updatedCrop = await Crop.findByIdAndUpdate(
-            req.params.id, 
+        const updatedCrop = await Crop.findOneAndUpdate(
+            { _id: req.params.id, userId: req.auth.userId }, // Verify ownership
             { 
                 name: req.body.name, 
                 area: req.body.area 
             }, 
-            { new: true } // This tells Mongoose to return the newly updated document
+            { returnDocument: 'after' }
         );
         
         if (!updatedCrop) {
-            return res.status(404).json({ message: "Field not found" });
+            return res.status(404).json({ message: "Field not found or unauthorized" });
         }
         
         res.json(updatedCrop);

@@ -3,7 +3,11 @@ const Expense = require('../models/Expense');
 // Add a new expense
 exports.addExpense = async (req, res) => {
     try {
-        const expense = new Expense(req.body);
+        // STRICT FIX: Force the Clerk user ID into the new expense document
+        const expense = new Expense({
+            ...req.body,
+            userId: req.auth.userId
+        });
         await expense.save();
         res.status(201).json(expense);
     } catch (err) {
@@ -14,7 +18,12 @@ exports.addExpense = async (req, res) => {
 // Get expenses for a specific crop
 exports.getExpensesByCrop = async (req, res) => {
     try {
-        const expenses = await Expense.find({ cropId: req.params.cropId });
+        // STRICT FIX: Only fetch expenses that match BOTH the cropId AND the logged-in userId
+        const expenses = await Expense.find({ 
+            cropId: req.params.cropId,
+            userId: req.auth.userId 
+        });
+        
         const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
         res.status(200).json({ expenses, total });
     } catch (err) {

@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const ExpenseSchema = new mongoose.Schema({
+    // NEW: This absolutely must be here to lock the data to a specific user!
+    userId: { type: String, required: true },
+    
     cropId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Crop', 
@@ -8,7 +11,6 @@ const ExpenseSchema = new mongoose.Schema({
     },
     category: { 
         type: String, 
-        // UPDATED: Now includes all the options from your Dashboard dropdown
         enum: ['Seeds', 'Irrigation', 'Labour', 'Fertilizers', 'Pesticides', 'Equipment', 'Labor', 'Fertilizer', 'Other'], 
         required: true 
     },
