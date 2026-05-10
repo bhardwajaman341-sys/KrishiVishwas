@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getAuth } = require('@clerk/express'); // <-- Import here too
-const { addExpense, getExpensesByCrop } = require('../controllers/expenseController');
+const { getAuth } = require('@clerk/express'); 
+const expenseController = require('../controllers/expenseController'); // Import the whole controller
 
-// OUR CUSTOM BOUNCER
+// OUR CUSTOM BOUNCER (Kept exactly as you had it)
 const protectRoute = (req, res, next) => {
     const auth = getAuth(req);
     
@@ -16,7 +16,10 @@ const protectRoute = (req, res, next) => {
 };
 
 // PERSONAL EXPENSE ROUTES (Secure)
-router.post('/add', protectRoute, addExpense);
-router.get('/:cropId', protectRoute, getExpensesByCrop);
+router.post('/add', protectRoute, expenseController.addExpense);
+router.get('/:cropId', protectRoute, expenseController.getExpensesByCrop);
+
+// FIXED: Uses consistent protectRoute and correct controller reference
+router.delete('/single/:id', protectRoute, expenseController.deleteExpense);
 
 module.exports = router;

@@ -11,6 +11,7 @@ const expenseRoutes = require('./routes/expenseRoutes');
 const videoRoutes = require("./routes/videoRoutes");
 const authRoutes = require('./routes/authRoutes');
 const climateRoutes = require('./routes/climateRoutes');
+const mspRoutes = require('./routes/mspRoutes');
 
 // 2. Initialize the AI with your secret key
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); 
@@ -37,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/crops', cropRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use("/api", videoRoutes);
+app.use("/api/msp", mspRoutes);
 
 // --- AI Chatbot Route ---
 app.post('/api/chat', async (req, res) => {

@@ -11,11 +11,11 @@ const Chatbot = () => {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     
-    // --- VOICE ASSISTANT STATES ---
-    const [isListening, setIsListening] = useState(false);
-    const [voiceLang, setVoiceLang] = useState('hi-IN'); // Default to Hindi
 
-    // Voice Languages List (10+ Languages)
+    const [isListening, setIsListening] = useState(false);
+    const [voiceLang, setVoiceLang] = useState('hi-IN');
+
+// Voice Languages List (10+ Languages)
     const languages = [
         { code: 'hi-IN', name: 'हिंदी (Hindi)' },
         { code: 'mr-IN', name: 'मराठी (Marathi)' },
@@ -29,7 +29,7 @@ const Chatbot = () => {
         { code: 'en-IN', name: 'English (India)' }
     ];
 
-    // --- TEXT-TO-SPEECH (Bot Speaks) ---
+//TEXT-TO-SPEECH (Bot Speaks)
     const speakText = (text) => {
         if (!window.speechSynthesis) return;
         const utterance = new SpeechSynthesisUtterance(text);
@@ -37,7 +37,7 @@ const Chatbot = () => {
         window.speechSynthesis.speak(utterance);
     };
 
-    // --- SPEECH-TO-TEXT (Bot Listens) ---
+//SPEECH-TO-TEXT (Bot Listens)
     const handleListen = () => {
         if (!recognition) {
             alert("Voice recognition is not supported in this browser. Please use Chrome.");
@@ -64,7 +64,7 @@ const Chatbot = () => {
         recognition.onend = () => setIsListening(false);
     };
 
-    // --- MESSAGE SENDING LOGIC ---
+//MESSAGE SENDING LOGIC
     const sendMessage = async (e) => {
         if (e) e.preventDefault();
         if (!input.trim()) return;
