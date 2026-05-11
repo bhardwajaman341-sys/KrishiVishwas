@@ -55,7 +55,47 @@ const translations = {
         navEnso: "ENSO Data",
         navWeather: "Weather",
         navInvest: "Farm Investments",
-        navMsp: "Official MSP Rates"
+        navMsp: "Official MSP Rates",
+        navLaws: "Farmer Laws",
+        // Law Translations (English)
+        lawsTitle: "⚖️ Farmer Protection Laws (IPC & BNS)",
+        lawsIntro: "Agriculture-related protection in Indian criminal law is spread across different offences rather than one separate “farmer law.” Earlier these offences were mainly under the Indian Penal Code (IPC). Since 2023–24, many IPC provisions have been replaced by the Bharatiya Nyaya Sanhita (BNS). Most concepts remain similar.",
+        law1Title: "🌾 1. Theft of Crops & Equipment",
+        law1Desc: "If someone steals harvested crops, tractors, irrigation pumps, seeds, or cattle, it becomes theft.",
+        law1Ipc: "Earlier IPC: Section 378 & 379",
+        law1Bns: "Under BNS: Equivalent theft provisions continue.",
+        law1Eg: "Example: Cutting and taking wheat from another field at night.",
+        law2Title: "🚜 2. Trespassing into Farmland",
+        law2Desc: "Illegally entering farmland to damage crops, occupy land, or graze animals intentionally.",
+        law2Ipc: "Earlier IPC: Section 441 & 447",
+        law2Eg: "Example: A neighbor forcefully entering field boundaries and destroying plantations.",
+        law3Title: "🌱 3. Mischief Causing Damage",
+        law3Desc: "Intentionally damaging standing crops, irrigation systems, tube wells, or farm machinery.",
+        law3Ipc: "Earlier IPC: Section 425 & 427",
+        law3Eg: "Example: Cutting irrigation pipes or burning crop residue to harm another farmer.",
+        law4Title: "🔥 4. Arson of Farms",
+        law4Desc: "Burning crop fields, hay storage, grain warehouses, or sheds is a serious criminal offence.",
+        law4Ipc: "Earlier IPC: Section 435 & 436",
+        law4Eg: "Example: Setting fire to harvested paddy stacks during a rivalry.",
+        law5Title: "💰 5. Cheating Farmers",
+        law5Desc: "Traders or agents using false weighing systems or selling fake agricultural products.",
+        law5Ipc: "Earlier IPC: Section 415 & 420",
+        law5Eg: "Example: Selling fake 'high-yield' seeds causing crop failure.",
+        law6Title: "🌾 6. Adulterated Inputs",
+        law6Desc: "Selling fake fertilizer, expired pesticide, misbranding seeds, or black marketing.",
+        law6Laws: "Relevant Laws: Essential Commodities Act, Fertilizer Control Order, Seeds Act.",
+        law7Title: "🐄 7. Animal Theft & Crimes",
+        law7Desc: "Stealing cows, buffaloes, or poultry is punishable like property theft.",
+        law7Eg: "Killing or poisoning farm animals can also lead to criminal liability.",
+        law8Title: "⚔️ 8. Threats & Extortion",
+        law8Desc: "Threatening a farmer over land, extorting money, or intimidating during harvest.",
+        law8Ipc: "Earlier IPC: Section 503, 384, 323.",
+        law9Title: "🌊 9. Water Theft",
+        law9Desc: "Damaging irrigation canals or illegally diverting water.",
+        law9Eg: "Leads to public property damage cases and irrigation act violations.",
+        law10Title: "🧾 10. Forgery of Land Records",
+        law10Desc: "Creating fake land papers, registry documents, crop insurance records, or loan papers.",
+        law10Ipc: "Earlier IPC: Section 463 & 468"
     },
     hi: {
         title1: "कृषि", title2: "विश्वास", 
@@ -105,14 +145,54 @@ const translations = {
         navEnso: "ENSO डेटा",
         navWeather: "मौसम",
         navInvest: "कृषि निवेश",
-        navMsp: "आधिकारिक एमएसपी दरें"
+        navMsp: "आधिकारिक एमएसपी दरें",
+        navLaws: "किसान कानून",
+        // Law Translations (Hindi)
+        lawsTitle: "⚖️ किसान संरक्षण कानून (IPC और BNS)",
+        lawsIntro: "भारतीय आपराधिक कानून में कृषि से संबंधित सुरक्षा एक अलग 'किसान कानून' के बजाय विभिन्न अपराधों में फैली हुई है। पहले ये अपराध मुख्य रूप से भारतीय दंड संहिता (IPC) के तहत आते थे। 2023-24 से, कई IPC प्रावधानों को भारतीय न्याय संहिता (BNS) द्वारा बदल दिया गया है। अधिकांश अवधारणाएँ समान हैं।",
+        law1Title: "🌾 1. फसलों और उपकरणों की चोरी",
+        law1Desc: "यदि कोई कटी हुई फसल, ट्रैक्टर, सिंचाई पंप, बीज या मवेशी चुराता है, तो यह चोरी माना जाता है।",
+        law1Ipc: "पूर्व IPC: धारा 378 और 379",
+        law1Bns: "BNS के तहत: चोरी के समान प्रावधान जारी हैं।",
+        law1Eg: "उदाहरण: रात में किसी अन्य खेत से गेहूं काटना और ले जाना।",
+        law2Title: "🚜 2. कृषि भूमि में अतिक्रमण",
+        law2Desc: "फसलों को नुकसान पहुंचाने, जमीन पर कब्जा करने या जानबूझकर जानवरों को चराने के लिए अवैध रूप से खेत में प्रवेश करना।",
+        law2Ipc: "पूर्व IPC: धारा 441 और 447",
+        law2Eg: "उदाहरण: एक पड़ोसी का जबरन खेत की सीमाओं में प्रवेश करना और फसल को नष्ट करना।",
+        law3Title: "🌱 3. नुकसान पहुँचाने वाली शरारत",
+        law3Desc: "खड़ी फसलों, सिंचाई प्रणालियों, ट्यूबवेल या कृषि मशीनरी को जानबूझकर नुकसान पहुंचाना।",
+        law3Ipc: "पूर्व IPC: धारा 425 और 427",
+        law3Eg: "उदाहरण: किसी अन्य किसान को नुकसान पहुंचाने के लिए सिंचाई पाइप काटना या फसल अवशेष जलाना।",
+        law4Title: "🔥 4. खेतों में आगजनी",
+        law4Desc: "फसल के खेतों, भूसे के भंडारण, अनाज के गोदामों या शेड को जलाना एक गंभीर आपराधिक अपराध है।",
+        law4Ipc: "पूर्व IPC: धारा 435 और 436",
+        law4Eg: "उदाहरण: दुश्मनी के दौरान धान के ढेरों में आग लगाना।",
+        law5Title: "💰 5. किसानों के साथ धोखाधड़ी",
+        law5Desc: "व्यापारी या एजेंट जो झूठी वजन प्रणाली का उपयोग करते हैं या नकली कृषि उत्पाद बेचते हैं।",
+        law5Ipc: "पूर्व IPC: धारा 415 और 420",
+        law5Eg: "उदाहरण: नकली 'उच्च उपज' वाले बीज बेचना जिससे फसल खराब हो जाए।",
+        law6Title: "🌾 6. मिलावटी कृषि सामग्री",
+        law6Desc: "नकली उर्वरक, एक्सपायर्ड कीटनाशक बेचना, बीजों की मिसब्रांडिंग या कालाबाजारी।",
+        law6Laws: "संबंधित कानून: आवश्यक वस्तु अधिनियम, उर्वरक नियंत्रण आदेश, बीज अधिनियम।",
+        law7Title: "🐄 7. पशु चोरी और अपराध",
+        law7Desc: "गायों, भैंसों या पोल्ट्री की चोरी करना संपत्ति की चोरी की तरह दंडनीय है।",
+        law7Eg: "खेत के जानवरों को मारना या जहर देना भी आपराधिक दायित्व को जन्म दे सकता है।",
+        law8Title: "⚔️ 8. धमकी और जबरन वसूली",
+        law8Desc: "जमीन को लेकर किसान को धमकाना, पैसे वसूलना, या फसल कटाई के दौरान डराना।",
+        law8Ipc: "पूर्व IPC: धारा 503, 384, 323।",
+        law9Title: "🌊 9. पानी की चोरी",
+        law9Desc: "सिंचाई नहरों को नुकसान पहुंचाना या अवैध रूप से पानी मोड़ना।",
+        law9Eg: "इससे सार्वजनिक संपत्ति के नुकसान और सिंचाई अधिनियम के उल्लंघन के मामले बनते हैं।",
+        law10Title: "🧾 10. भूमि रिकॉर्ड की जालसाजी",
+        law10Desc: "फर्जी भूमि के कागजात, रजिस्ट्री दस्तावेज, फसल बीमा रिकॉर्ड या ऋण के कागजात बनाना।",
+        law10Ipc: "पूर्व IPC: धारा 463 और 468"
     }
 };
 
 const Dashboard = () => {
     const { getToken, isSignedIn } = useAuth();
 
-// UI States
+    // UI States
     const [showSplash, setShowSplash] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false); // FOR THE LOGO SCREEN
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -143,7 +223,7 @@ const Dashboard = () => {
 
     const t = translations[lang];
 
-// TRANSITION HANDLER
+    // TRANSITION HANDLER
     const handleSkipToMain = () => {
         setIsTransitioning(true);
         setTimeout(() => {
@@ -355,6 +435,9 @@ const Dashboard = () => {
                 <button onClick={() => setActiveTab('msp')} style={{ textAlign: 'left', padding: '12px 15px', background: activeTab === 'msp' ? '#2c3e50' : 'transparent', color: activeTab === 'msp' ? '#3498db' : '#ecf0f1', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
                     🌾 {t.navMsp}
                 </button>
+                <button onClick={() => setActiveTab('laws')} style={{ textAlign: 'left', padding: '12px 15px', background: activeTab === 'laws' ? '#2c3e50' : 'transparent', color: activeTab === 'laws' ? '#3498db' : '#ecf0f1', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    ⚖️ {t.navLaws}
+                </button>
             </div>
         </div>
     );
@@ -366,11 +449,11 @@ const Dashboard = () => {
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: '#0f171e', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', boxSizing: 'border-box' }}>
                     {!isTransitioning ? (
                         <>
-                            <h1 style={{ color: '#2ecc71', marginBottom: '20px', fontSize: '2.5rem' }}>Welcome to Krishi Vishwas</h1>
+                            <h1 style={{ color: '#2ecc71', marginBottom: '20px', fontSize: '2.5rem', textAlign: 'center' }}>Welcome to Krishi Vishwas</h1>
                             <video src="/demo-video.mp4" controls autoPlay style={{ width: '100%', maxWidth: '800px', borderRadius: '15px', boxShadow: '0 10px 40px rgba(0,0,0,0.6)', border: '2px solid #34495e', backgroundColor: '#000' }}>
                                 Your browser does not support the video tag.
                             </video>
-                            <p style={{ color: '#bdc3c7', fontSize: '1.2rem', marginTop: '20px', fontWeight: 'bold' }}>How to use this application ??</p>
+                            <p style={{ color: '#bdc3c7', fontSize: '1.2rem', marginTop: '20px', fontWeight: 'bold', textAlign: 'center' }}>How to use this application ⬆️ ??</p>
                             <div style={{ marginTop: '15px' }}>
                                 <button onClick={handleSkipToMain} style={{ padding: '15px 30px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '30px', fontSize: '1.2rem', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 5px 15px rgba(231, 76, 60, 0.4)' }}>
                                     Skip to Main Content ⏭️
@@ -600,6 +683,107 @@ const Dashboard = () => {
 
                         {activeTab === 'msp' && (
                             <MspTracker lang={lang} />
+                        )}
+
+                        {/* NEW TAB: FARMER LAWS (OPEN FOR ALL) */}
+                        {activeTab === 'laws' && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <div style={{ background: '#2c3e50', padding: '30px', borderRadius: '15px' }}>
+                                    <h2 style={{ color: '#f1c40f', margin: '0 0 15px 0', borderBottom: '2px solid #34495e', paddingBottom: '10px' }}>{t.lawsTitle}</h2>
+                                    <p style={{ lineHeight: '1.6', fontSize: '1.1rem', color: '#ecf0f1' }}>
+                                        {t.lawsIntro}
+                                    </p>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                                    
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #3498db' }}>
+                                        <h3 style={{ color: '#3498db', marginTop: 0 }}>{t.law1Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law1Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law1Ipc}</strong></li>
+                                            <li><strong>{t.law1Bns}</strong></li>
+                                            <li><strong>{t.law1Eg}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #e74c3c' }}>
+                                        <h3 style={{ color: '#e74c3c', marginTop: 0 }}>{t.law2Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law2Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law2Ipc}</strong></li>
+                                            <li><strong>{t.law2Eg}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #f39c12' }}>
+                                        <h3 style={{ color: '#f39c12', marginTop: 0 }}>{t.law3Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law3Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law3Ipc}</strong></li>
+                                            <li><strong>{t.law3Eg}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #c0392b' }}>
+                                        <h3 style={{ color: '#c0392b', marginTop: 0 }}>{t.law4Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law4Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law4Ipc}</strong></li>
+                                            <li><strong>{t.law4Eg}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #2ecc71' }}>
+                                        <h3 style={{ color: '#2ecc71', marginTop: 0 }}>{t.law5Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law5Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law5Ipc}</strong></li>
+                                            <li><strong>{t.law5Eg}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #9b59b6' }}>
+                                        <h3 style={{ color: '#9b59b6', marginTop: 0 }}>{t.law6Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law6Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law6Laws}</strong></li>                                                                                                                                                                                                                                                                                                                          
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #e67e22' }}>
+                                        <h3 style={{ color: '#e67e22', marginTop: 0 }}>{t.law7Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law7Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li>{t.law7Eg}</li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #34495e' }}>
+                                        <h3 style={{ color: '#34495e', marginTop: 0 }}>{t.law8Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law8Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law8Ipc}</strong></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #1abc9c' }}>
+                                        <h3 style={{ color: '#1abc9c', marginTop: 0 }}>{t.law9Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law9Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li>{t.law9Eg}</li>
+                                        </ul>
+                                    </div>
+
+                                    <div style={{ background: '#1a252f', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #7f8c8d' }}>
+                                        <h3 style={{ color: '#7f8c8d', marginTop: 0 }}>{t.law10Title}</h3>
+                                        <p style={{ color: '#bdc3c7', fontSize: '0.95rem' }}>{t.law10Desc}</p>
+                                        <ul style={{ color: '#ecf0f1', fontSize: '0.9rem', paddingLeft: '20px' }}>
+                                            <li><strong>{t.law10Ipc}</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                     </div>
