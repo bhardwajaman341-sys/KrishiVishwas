@@ -75,7 +75,7 @@ const Chatbot = () => {
         setIsTyping(true);
 
         try {
-            const res = await axios.post('http://localhost:5001/api/chat', { message: userMsg } , { timeout: 15000 });
+            const res = await axios.post('https://krishivishwas-backend.onrender.com/api/chat', { message: userMsg } , { timeout: 15000 });
             const botReply = res.data.reply;
             
             setMessages((prev) => [...prev, { text: botReply, isBot: true }]);

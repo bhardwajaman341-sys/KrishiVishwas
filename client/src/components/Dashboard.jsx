@@ -529,17 +529,17 @@ const Dashboard = () => {
 
     const fetchData = async () => {
         try {
-            const ensoRes = await axios.get('http://localhost:5001/api/climate/enso');
+            const ensoRes = await axios.get('https://krishivishwas-backend.onrender.com/api/climate/enso');
             setEnsoData(ensoRes.data);
             if (isSignedIn) {
                 const token = await getToken();
                 const headers = { Authorization: `Bearer ${token}` };
-                const cropsRes = await axios.get('http://localhost:5001/api/crops', { headers });
+                const cropsRes = await axios.get('https://krishivishwas-backend.onrender.com/api/crops', { headers });
                 setCrops(cropsRes.data);
                 const totals={}, breakdowns={}, listData={};
                 const categoryMap={'Seeds':0,'Irrigation':1,'Labour':2,'Fertilizers':3,'Pesticides':4,'Equipment':5};
                 await Promise.all(cropsRes.data.map(async (c) => {
-                    const e = await axios.get(`http://localhost:5001/api/expenses/${c._id}`, { headers });
+                    const e = await axios.get(`https://krishivishwas-backend.onrender.com/api/expenses/${c._id}`, { headers });
                     totals[c._id] = e.data.total;
                     listData[c._id] = e.data.expenses;
                     const chartData = [0,0,0,0,0,0];
@@ -583,14 +583,14 @@ const Dashboard = () => {
 
     const handleSearch = async () => {
         if (!searchQuery) return;
-        const res = await axios.get(`http://localhost:5001/api/crops/search?q=${searchQuery}`);
+        const res = await axios.get(`https://krishivishwas-backend.onrender.com/api/crops/search?q=${searchQuery}`);
         setSearchResult(res.data[0]);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm(t.confirmRemoveField)) {
             const token = await getToken();
-            await axios.delete(`http://localhost:5001/api/crops/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.delete(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, { headers: { Authorization: `Bearer ${token}` } });
             fetchData();
         }
     };
@@ -598,7 +598,7 @@ const Dashboard = () => {
     const handleAddCrop = async (e) => {
         e.preventDefault();
         const token = await getToken();
-        await axios.post('http://localhost:5001/api/crops/add', newCrop, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.post('https://krishivishwas-backend.onrender.com/api/crops/add', newCrop, { headers: { Authorization: `Bearer ${token}` } });
         setNewCrop({ name:'', area:'', expectedYield:'' });
         fetchData();
     };
@@ -611,7 +611,7 @@ const Dashboard = () => {
         const inp = expenseInputs[cropId];
         if (!inp?.amount) return;
         const token = await getToken();
-        await axios.post('http://localhost:5001/api/expenses/add', { cropId, amount: inp.amount, category: inp.category || 'Seeds' }, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.post('https://krishivishwas-backend.onrender.com/api/expenses/add', { cropId, amount: inp.amount, category: inp.category || 'Seeds' }, { headers: { Authorization: `Bearer ${token}` } });
         setExpenseInputs(prev => ({ ...prev, [cropId]: { amount:'', category:'Seeds' } }));
         fetchData();
     };
@@ -620,7 +620,7 @@ const Dashboard = () => {
         if (window.confirm(t.confirmDeleteLog)) {
             try {
                 const token = await getToken();
-                await axios.delete(`http://localhost:5001/api/expenses/single/${expenseId}`, { headers: { Authorization: `Bearer ${token}` } });
+                await axios.delete(`https://krishivishwas-backend.onrender.com/api/expenses/single/${expenseId}`, { headers: { Authorization: `Bearer ${token}` } });
                 fetchData();
             } catch(err) { console.error(err); }
         }
@@ -633,7 +633,7 @@ const Dashboard = () => {
 
     const handleEditSave = async (id) => {
         const token = await getToken();
-        await axios.put(`http://localhost:5001/api/crops/${id}`, {
+        await axios.put(`https://krishivishwas-backend.onrender.com/api/crops/${id}`, {
             name: editForm.name, area: Number(editForm.area),
             expectedYield: Number(editForm.expectedYield),
             soilHealth: { ...editForm.soilHealth, isAnalyzed: true }
