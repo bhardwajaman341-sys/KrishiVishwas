@@ -1,17 +1,16 @@
 require('dotenv').config();
-// 1. Import the necessary tools (Dependencies)
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { GoogleGenAI } = require('@google/genai'); 
 const { clerkMiddleware } = require('@clerk/express');
-
 const cropRoutes = require('./routes/cropRoutes'); 
 const expenseRoutes = require('./routes/expenseRoutes');
 const videoRoutes = require("./routes/videoRoutes");
 const authRoutes = require('./routes/authRoutes');
 const climateRoutes = require('./routes/climateRoutes');
 const mspRoutes = require('./routes/mspRoutes');
+// const axios = require('axios');
 
 // 2. Initialize the AI with your secret key
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); 
@@ -59,7 +58,25 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ reply: "Sorry, the network is down. Please try again later." });
     }
 });
-// -----------------------------
+
+// app.post('/api/send-sms', async (req, res) => {
+//     const { message, phoneNumber } = req.body;
+    
+//     try {
+//         const response = await axios.get('https://www.fast2sms.com/dev/bulkV2', {
+//             params: {
+//                 authorization: process.env.FAST2SMS_API_KEY,
+//                 route: 'q', // Quick route for testing
+//                 message: message,
+//                 numbers: phoneNumber,
+//             }
+//         });
+//         res.json({ success: true, data: response.data });
+//     } catch (error) {
+//         console.error("SMS Error:", error.response?.data || error.message);
+//         res.status(500).json({ success: false, error: "Failed to send SMS" });
+//     }
+// });
 
 // 5. MongoDB Connection Logic
 mongoose.connect(process.env.MONGO_URI)
